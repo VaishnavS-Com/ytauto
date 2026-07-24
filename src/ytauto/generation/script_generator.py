@@ -32,6 +32,7 @@ from ytauto.config import settings
 from ytauto.llm.ollama_client import LLMError, generate_json, generate_text
 from ytauto.logging_setup import get_logger
 from ytauto.repositories import script_repository, topic_repository
+from ytauto.research.wiki_research import gather_notes
 
 log = get_logger(__name__)
 
@@ -40,31 +41,50 @@ tech/AI channel (curious general audience, 5-8 minutes, narrated slideshow).
 
 TOPIC: {topic}
 
+VERIFIED SOURCE NOTES (the only trusted facts available):
+{notes}
+
 Design the video with LASER FOCUS on this specific topic — do not widen
 it into a survey of related concepts. All 4 chapters must directly explain
-the stated topic, nothing adjacent.
+the stated topic, nothing adjacent, and must be coverable using the notes.
 
 Answer with ONLY this JSON:
 {{"title": "<clear, honest, searchable video title - no clickbait>",
 "chapters": ["<chapter 1 title>", "<chapter 2 title>",
 "<chapter 3 title>", "<chapter 4 title>"]}}"""
 
+# GROUNDING RULES — born from the 'Recurrent Attention Graph' incident:
+# the model invented a definition and a statistic because we ASKED it for
+# "at least one real number" with no facts to draw on. Now: facts may come
+# ONLY from the notes; no notes on a point = explain conceptually, no
+# numbers, no names. Fabricating confidently is the one unforgivable sin
+# for an explainer channel.
 SECTION_PROMPT = """You are writing narration for a faceless YouTube \
 explainer video titled "{title}".
+
+VERIFIED SOURCE NOTES (the ONLY facts you may state):
+{notes}
 
 Full chapter plan: {chapters}
 
 Write ONLY the narration for the chapter: "{chapter}"
 
 Rules:
+- FACTS: only from the notes above. NEVER invent definitions, numbers,
+  statistics, dates, or named examples. If the notes don't cover a point,
+  explain the concept in plain language WITHOUT specifics.
 - around 150 words, spoken style: short sentences, no headings, no lists
-- explain like a friendly expert; one concrete example or analogy
-- include at least one real number, statistic, or named example
+- explain like a friendly expert; one concrete analogy is welcome
+  (analogies are illustrations, not facts — those you may create)
 - VARY your sentence openings — never start two consecutive sentences
   with the same word or phrase (especially avoid repeating "So", "This",
   "That", "Now", "And")
 - do not greet the viewer, do not say "in this chapter", just narrate
 - do not repeat other chapters' content"""
+
+NO_NOTES_FALLBACK = """(No source notes are available. You must not state
+ANY specific numbers, statistics, dates, or named products/papers. Explain
+purely conceptually, using analogies.)"""
 
 HOOK_CTA_PROMPT = """A faceless YouTube explainer video titled "{title}" \
 covers these chapters: {chapters}
@@ -101,6 +121,7 @@ def generate_script(
     topic_id: int | None = None,
     gen_json: Callable[..., dict] = generate_json,
     gen_text: Callable[..., str] = generate_text,
+    gather: Callable[..., str] = gather_notes,
     db_path: Path | None = None,
 ) -> int:
     """Run the full chain for one topic. Returns the saved script id.
@@ -114,18 +135,31 @@ def generate_script(
         if row is None:
             raise LLMError("No ranked topics available — run rank_topics first")
         topic_id, topic_title = row["id"], row["title"]
+        cached_notes = row["research_notes"]
     else:
         match = [r for r in topic_repository.list_topics(db_path=db_path)
                  if r["id"] == topic_id]
         if not match:
             raise LLMError(f"Topic id {topic_id} not found")
         topic_title = match[0]["title"]
+        cached_notes = match[0]["research_notes"]
 
     log.info("Generating script for topic %d: %r", topic_id, topic_title)
 
+    # --- Step 0: research (Milestone 8 — ground before you write) -------------
+    notes = cached_notes
+    if not notes:
+        notes = gather(topic_title, gen_json=gen_json)
+        if notes:
+            topic_repository.set_research_notes(topic_id, notes, db_path=db_path)
+    if not notes:
+        notes = NO_NOTES_FALLBACK
+    log.info("Research notes: %d chars", len(notes))
+
     # --- Step 1: plan (cold) -------------------------------------------------
     title, chapters = parse_plan(
-        gen_json(PLAN_PROMPT.format(topic=topic_title), temperature=0.4)
+        gen_json(PLAN_PROMPT.format(topic=topic_title, notes=notes),
+                 temperature=0.4)
     )
     log.info("Plan: %r with %d chapters", title, len(chapters))
 
@@ -133,7 +167,8 @@ def generate_script(
     sections = []
     for chapter in chapters:
         text = gen_text(
-            SECTION_PROMPT.format(title=title, chapters=chapters, chapter=chapter),
+            SECTION_PROMPT.format(title=title, chapters=chapters,
+                                  chapter=chapter, notes=notes),
             temperature=0.7,
         )
         # Collapse internal blank lines within a section so \n\n in body strictly separates chapters

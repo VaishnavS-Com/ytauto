@@ -59,12 +59,16 @@ def fake_text(prompt: str, temperature: float = 0.7) -> str:
     return "This is a narration section with a friendly explanation. " * 10
 
 
+def fake_gather(topic_title, gen_json=None):
+    return "[Source: Wikipedia — Testing]\nA fake but verified note."
+
+
 def test_generate_script_full_chain(db):
     topic_id = topics.add_topic("AI in drug discovery", niche="tech", db_path=db)
     topics.set_rank(topic_id, 8.0, "evergreen", db_path=db)
 
     script_id = generate_script(
-        gen_json=fake_json, gen_text=fake_text, db_path=db
+        gen_json=fake_json, gen_text=fake_text, gather=fake_gather, db_path=db
     )
 
     saved = script_repository.latest_script(topic_id, db_path=db)
@@ -81,7 +85,8 @@ def test_generate_script_full_chain(db):
 
 def test_generate_script_no_ranked_topics(db):
     with pytest.raises(LLMError):
-        generate_script(gen_json=fake_json, gen_text=fake_text, db_path=db)
+        generate_script(gen_json=fake_json, gen_text=fake_text,
+                        gather=fake_gather, db_path=db)
 
 
 def test_failure_keeps_topic_ranked_and_saves_nothing(db):
@@ -95,7 +100,8 @@ def test_failure_keeps_topic_ranked_and_saves_nothing(db):
         return fake_json(prompt, temperature)
 
     with pytest.raises(LLMError):
-        generate_script(gen_json=json_fails_on_hook, gen_text=fake_text, db_path=db)
+        generate_script(gen_json=json_fails_on_hook, gen_text=fake_text,
+                        gather=fake_gather, db_path=db)
 
     assert script_repository.get_scripts_for_topic(topic_id, db_path=db) == []
     assert topics.list_topics(status="ranked", db_path=db)[0]["id"] == topic_id
@@ -107,9 +113,33 @@ def test_multiple_drafts_per_topic(db):
     topics.set_rank(topic_id, 9.0, "great", db_path=db)
 
     generate_script(topic_id=topic_id, gen_json=fake_json, gen_text=fake_text,
-                    db_path=db)
+                    gather=fake_gather, db_path=db)
     generate_script(topic_id=topic_id, gen_json=fake_json, gen_text=fake_text,
-                    db_path=db)
+                    gather=fake_gather, db_path=db)
 
     drafts = script_repository.get_scripts_for_topic(topic_id, db_path=db)
     assert len(drafts) == 2
+
+
+def test_temperature_per_stage_spied(db):
+    """Verify that structure uses low temperature (0.4), sections use 0.7, hook uses 0.8."""
+    topic_id = topics.add_topic("Temperature Test", niche="tech", db_path=db)
+    topics.set_rank(topic_id, 8.0, "x", db_path=db)
+
+    json_temps = []
+    text_temps = []
+
+    def spy_json(prompt, temperature=0.2):
+        json_temps.append(temperature)
+        return fake_json(prompt, temperature)
+
+    def spy_text(prompt, temperature=0.7):
+        text_temps.append(temperature)
+        return fake_text(prompt, temperature)
+
+    generate_script(topic_id=topic_id, gen_json=spy_json, gen_text=spy_text,
+                    gather=fake_gather, db_path=db)
+
+    assert json_temps == [0.4, 0.8]  # plan, hook+cta
+    assert all(t == 0.7 for t in text_temps)  # narration sections
+

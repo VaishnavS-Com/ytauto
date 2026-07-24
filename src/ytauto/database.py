@@ -157,5 +157,6 @@ def init_db(db_path: Path | None = None) -> None:
     with get_connection(db_path) as conn:
         conn.executescript(SCHEMA)
         # --- migrations (each one idempotent, in the order they were added) ---
-        _ensure_column(conn, "topics", "rank_reason", "TEXT")   # Milestone 3
+        _ensure_column(conn, "topics", "rank_reason", "TEXT")     # Milestone 3
+        _ensure_column(conn, "topics", "research_notes", "TEXT")  # Milestone 8
     log.info("Database initialized")

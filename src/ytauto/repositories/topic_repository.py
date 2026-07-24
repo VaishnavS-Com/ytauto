@@ -100,6 +100,18 @@ def update_status(topic_id: int, status: str, db_path: Path | None = None) -> bo
     return updated
 
 
+def set_research_notes(
+    topic_id: int, notes: str, db_path: Path | None = None
+) -> bool:
+    """Cache gathered research so a topic is researched at most once."""
+    with get_connection(db_path) as conn:
+        cursor = conn.execute(
+            "UPDATE topics SET research_notes = ? WHERE id = ?",
+            (notes, topic_id),
+        )
+        return cursor.rowcount > 0
+
+
 def best_ranked_topic(db_path: Path | None = None) -> sqlite3.Row | None:
     """The highest-scored topic still waiting for a script, or None."""
     with get_connection(db_path) as conn:
