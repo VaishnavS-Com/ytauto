@@ -76,3 +76,18 @@ def test_delete_topic(db):
     # Deleting the same id again should return False (already gone).
     assert topics.delete_topic(topic_id, db_path=db) is False
 
+
+def test_add_topic_collapses_internal_whitespace(db):
+    """Embedded newlines and extra spaces must be cleaned before storage.
+
+    Reproduces the real Finding 1: topic 1 ('How do neural\\n   networks
+    learn?') had a literal newline flow straight into an LLM prompt.
+    """
+    topic_id = topics.add_topic(
+        "How do neural\n   networks learn?", niche="tech", db_path=db
+    )
+    row = topics.list_topics(db_path=db)[0]
+    assert row["title"] == "How do neural networks learn?"
+    assert "\n" not in row["title"]
+
+

@@ -42,7 +42,7 @@ def add_topic(
     db_path: Path | None = None,
 ) -> int | None:
     """Insert a topic. Returns its new id, or None if it's a duplicate."""
-    title = title.strip()
+    title = " ".join(title.split())   # collapse all whitespace incl. newlines
     if not title:
         raise ValueError("Topic title cannot be empty")
 

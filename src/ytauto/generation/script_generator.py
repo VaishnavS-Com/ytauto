@@ -40,7 +40,11 @@ tech/AI channel (curious general audience, 5-8 minutes, narrated slideshow).
 
 TOPIC: {topic}
 
-Design the video. Answer with ONLY this JSON:
+Design the video with LASER FOCUS on this specific topic — do not widen
+it into a survey of related concepts. All 4 chapters must directly explain
+the stated topic, nothing adjacent.
+
+Answer with ONLY this JSON:
 {{"title": "<clear, honest, searchable video title - no clickbait>",
 "chapters": ["<chapter 1 title>", "<chapter 2 title>",
 "<chapter 3 title>", "<chapter 4 title>"]}}"""
@@ -55,6 +59,10 @@ Write ONLY the narration for the chapter: "{chapter}"
 Rules:
 - around 150 words, spoken style: short sentences, no headings, no lists
 - explain like a friendly expert; one concrete example or analogy
+- include at least one real number, statistic, or named example
+- VARY your sentence openings — never start two consecutive sentences
+  with the same word or phrase (especially avoid repeating "So", "This",
+  "That", "Now", "And")
 - do not greet the viewer, do not say "in this chapter", just narrate
 - do not repeat other chapters' content"""
 
@@ -62,9 +70,10 @@ HOOK_CTA_PROMPT = """A faceless YouTube explainer video titled "{title}" \
 covers these chapters: {chapters}
 
 Write its opening hook and closing call-to-action. Answer with ONLY this JSON:
-{{"hook": "<2-3 spoken sentences that make a curious viewer stay - open with \
-a surprising fact or question, no 'welcome back', no channel name>",
-"cta": "<1-2 spoken sentences asking to subscribe for more explainers, \
+{{"hook": "<2-3 spoken sentences that make a curious viewer stay. Open with
+a surprising fact, a number, or a tension — NOT 'Did you know', NOT
+'Today we', NOT 'Welcome back'. No channel name.>",
+"cta": "<1-2 spoken sentences asking to subscribe for more explainers,
 friendly not pushy>"}}"""
 
 
