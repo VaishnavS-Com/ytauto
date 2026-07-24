@@ -23,7 +23,7 @@ Python, Windows laptop, 8–16 GB RAM, no GPU, Ollama not yet installed.
 
 | Phase | What | Status |
 |---|---|---|
-| 1 | Find trending topics, multi-source collection, topic DB, dedupe, AI ranking | 🔨 Started (DB layer done) |
+| 1 | Find trending topics, multi-source collection, topic DB, dedupe, AI ranking | 🔨 Started (collection done, ranking next) |
 | 2 | LLM generation: title, script, hook, CTA, chapters, description, tags, keywords | ⬜ |
 | 3 | Voiceover via free TTS (Edge TTS / Coqui) | ⬜ |
 | 4 | AI image generation (free/local) | ⬜ |
@@ -67,15 +67,29 @@ FastAPI, Gradio, YouTube API, Git.
 5. ✅ Thinking: separate `scripts` table (one topic → many drafts)
 6. ✅ Committed + pushed
 
+### ✅ Milestone 2 — Trending-topic collector (docs/milestones/milestone_02.md)
+- `pyproject.toml` — proper editable install (`pip install -e .`), killed `sys.path` hack
+- `src/ytauto/http_client.py` — timeouts, exponential-backoff retries, `FetchError`
+- `src/ytauto/collectors/` — RSS (5 feeds) + Reddit (public JSON), relevance filter
+- `scripts/collect_topics.py` — one-command idempotent pipeline
+- 20 passing tests (zero network calls)
+
+**Milestone 2 exercises — ✅ ALL DONE**
+1. ✅ Installed properly, ran collection (32 topics), proved idempotency
+2. ✅ Killed sys.path hack from all 5 files, 20 tests still pass
+3. ✅ Tuned relevance filter — replaced broad "model" with specific AI terms
+4. ✅ Added MIT Tech Review feed (one line = one new source)
+5. ✅ Wrote case-insensitivity test → 20 passed
+6. ✅ Thinking: recency + title length as cheap RSS quality signals
+7. ✅ Committed + pushed
+
 ## Next up
 
-**Milestone 2 — Trending-topic collector** (first real automation):
-fetch trending tech content from free sources (RSS, Reddit public JSON) with
-a proper HTTP client (timeouts, retries, error handling); auto-fill the
-database. Also: replace the `sys.path` hack with `pip install -e .`.
-
-Then M3+: smarter dedupe, AI ranking via Ollama (installing it then), and on
-into Phase 2.
+**Milestone 3 — AI topic ranking** (first AI in the pipeline):
+Install Ollama, pull a small model (Gemma 2B / Phi-3 class), build the topic
+ranker: LLM scores each `new` topic for video-worthiness, writes `score` back
+to the DB, moves topics from `new` to `ranked`. Prompt engineering, structured
+LLM output (JSON mode), and handling model failures gracefully.
 
 ## Key habits established
 
@@ -84,6 +98,9 @@ into Phase 2.
 - Every module: `from ytauto.logging_setup import get_logger` — no `print` in library code
 - All SQL stays in `repositories/`; always `?` placeholders, never f-strings
 - Every milestone ships with tests; tests use throwaway DBs, never real data
+- Network code: always set timeouts, retry with backoff, isolate failures
+- Separate fetch (network) from parse (pure logic) — test parse, mock fetch
+- `pip install -e .` for imports; never use `sys.path` hacks
 
 ## Resume prompt (paste into a new chat)
 
@@ -91,7 +108,8 @@ into Phase 2.
 PROJECT_STATE.md and docs/milestones/ in my automation_progress folder for
 full context. We are building an AI-powered faceless-YouTube automation
 system in phases, one milestone per session, with theory + code + exercises,
-production-quality, free tools only. Milestones 0 and 1 are complete
-(foundation; SQLite topic database). Check the 'exercises' status in
+production-quality, free tools only. Milestones 0–2 are complete
+(foundation; SQLite topic database; trending-topic collector with HTTP
+client, RSS/Reddit sources, 20 tests). Check the 'exercises' status in
 PROJECT_STATE.md, review my exercise work if pending, then continue with the
 next milestone listed under 'Next up'. Never skip steps, teach as you build."
