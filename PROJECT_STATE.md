@@ -25,7 +25,7 @@ Python, Windows laptop, 8–16 GB RAM, no GPU, Ollama installed (llama3.2:3b).
 |---|---|---|
 | 1 | Find trending topics, multi-source collection, topic DB, dedupe, AI ranking | ✅ COMPLETE |
 | 2 | LLM generation: title, script, hook, CTA, chapters, description, tags, keywords | 🔨 Started (script chain done) |
-| 3 | Voiceover via free TTS (Edge TTS / Coqui) | ⬜ |
+| 3 | Voiceover via free TTS (Edge TTS / Coqui) | ✅ COMPLETE |
 | 4 | AI image generation (free/local) | ⬜ |
 | 5 | B-roll: generate or auto-download copyright-free clips | ⬜ |
 | 6 | Final video assembly: subtitles, transitions, zooms, music, captions (MoviePy/FFmpeg) | ⬜ |
@@ -112,12 +112,28 @@ FastAPI, Gradio, YouTube API, Git.
 5. ✅ Thinking: word-count guard belongs after body assembly, raises LLMError
 6. ✅ Committed + pushed
 
+### ✅ Milestone 5 — Voiceover with Edge TTS (docs/milestones/milestone_05.md) — Phase 3 COMPLETE
+- `src/ytauto/tts/edge_client.py` — async bridge via `asyncio.run()`, 0-byte check
+- `src/ytauto/tts/voiceover_generator.py` — `split_into_parts()`, per-part MP3 files,
+  idempotent regeneration, DB + filesystem atomic rollback on failure
+- `src/ytauto/repositories/voiceover_repository.py` — `voiceovers` table with FK to scripts
+- 45 passing tests (fake synth in tests, zero network required)
+- Generated real voiceovers: 10 MP3 audio parts (1.5 MB) for `script_2` using `en-US-ChristopherNeural`
+
+**Milestone 5 exercises — ✅ ALL DONE**
+1. ✅ `pip install -r requirements.txt` + `pytest` → 45 passed
+2. ✅ Synthesized real voiceover (`script_2`): 10 parts, 1.5 MB audio in `data/audio/script_2`
+3. ✅ Configured `TTS_VOICE` in `.env` (configurable channel voice identity)
+4. ✅ Wrote single-section split test → 45 passed
+5. ✅ Thinking: concurrent TTS risks 429 rate-limiting; protected by exponential backoff (M2 concept)
+6. ✅ Committed + pushed
+
 ## Next up
 
-**Milestone 5 — Voiceover (Phase 3).** The script becomes an MP3 with
-Edge TTS (free, neural voices, no API key): async Python, per-section audio
-files, `voiceovers` table pointing at scripts, first media artifact in the
-pipeline.
+**Milestone 6 — Image generation & slide rendering (Phase 4).** Every part gets a visual:
+AI-generated images via free APIs / local SD where feasible, plus a programmatic slide
+renderer with Pillow (title cards, key-point slides) as the reliable workhorse. `assets`
+table for tracking media items, with LLM generating visual prompts from section text.
 
 ## Key habits established
 
@@ -139,8 +155,8 @@ pipeline.
 PROJECT_STATE.md and docs/milestones/ in my automation_progress folder for
 full context. We are building an AI-powered faceless-YouTube automation
 system in phases, one milestone per session, with theory + code + exercises,
-production-quality, free tools only. Milestones 0–4 are complete
-(foundation; topic DB; RSS/Reddit collector; AI topic ranker with Ollama;
-script generator with 3-step prompt chain, 38 tests). Check the 'exercises'
-status in PROJECT_STATE.md, review my exercise work if pending, then continue
-with the next milestone listed under 'Next up'. Never skip steps, teach as you build."
+production-quality, free tools only. Milestones 0–5 are complete
+(foundation; topic DB; RSS/Reddit collector; AI topic ranker; script generator;
+Edge TTS voiceover pipeline, 45 tests). Check the 'exercises' status in
+PROJECT_STATE.md, review my exercise work if pending, then continue with the
+next milestone listed under 'Next up'. Never skip steps, teach as you build."
