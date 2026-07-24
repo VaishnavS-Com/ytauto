@@ -75,6 +75,34 @@ def fetch_json(url: str, retries: int = 3, timeout: int = DEFAULT_TIMEOUT) -> di
     return json.loads(fetch_text(url, retries=retries, timeout=timeout))
 
 
+def fetch_bytes(url: str, retries: int = 3, timeout: int = 60) -> bytes:
+    """GET a URL and return raw bytes (Milestone 6: image downloads).
+
+    Text APIs return .text; media downloads need .content — bytes,
+    untouched by any encoding. Longer timeout: image generation services
+    render on demand and can take 30s+.
+    """
+    last_error: Exception | None = None
+
+    for attempt in range(1, retries + 1):
+        try:
+            response = requests.get(
+                url, timeout=timeout, headers={"User-Agent": USER_AGENT}
+            )
+            response.raise_for_status()
+            return response.content
+        except requests.RequestException as exc:
+            last_error = exc
+            wait = 2 ** attempt
+            log.warning("Fetch-bytes failed (attempt %d/%d) for %s: %s",
+                        attempt, retries, url, exc)
+            if attempt < retries:
+                time.sleep(wait)
+
+    log.error("Giving up on %s after %d attempts", url, retries)
+    raise FetchError(f"Could not fetch {url}") from last_error
+
+
 def post_json(
     url: str,
     payload: dict,

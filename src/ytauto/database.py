@@ -90,6 +90,20 @@ CREATE TABLE IF NOT EXISTS voiceovers (
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
     UNIQUE (script_id, part_index)   -- no duplicate parts per script
 );
+
+-- Milestone 6: visual assets. One row per (part, kind): every audio part
+-- gets at least a rendered slide; optionally also an AI image. `meta`
+-- stores the text/prompt that produced the visual (provenance again).
+CREATE TABLE IF NOT EXISTS assets (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    script_id  INTEGER NOT NULL REFERENCES scripts(id),
+    part_index INTEGER NOT NULL,
+    kind       TEXT NOT NULL CHECK (kind IN ('slide', 'ai_image')),
+    file_path  TEXT NOT NULL,
+    meta       TEXT NOT NULL DEFAULT '',
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    UNIQUE (script_id, part_index, kind)
+);
 """
 
 
