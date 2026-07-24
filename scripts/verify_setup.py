@@ -7,12 +7,6 @@ From the project root, with your virtual environment active:
 Expected: settings print to screen, and a log line appears in logs/app.log.
 """
 
-import sys
-from pathlib import Path
-
-# Make `src/` importable when running this script directly.
-# (In Milestone 2 we replace this hack with a proper editable install.)
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
 from ytauto.config import settings
 from ytauto.logging_setup import get_logger

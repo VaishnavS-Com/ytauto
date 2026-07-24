@@ -12,10 +12,6 @@ professional CLI you've used (git, pip) follows this subcommand pattern.
 """
 
 import argparse
-import sys
-from pathlib import Path
-
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
 from ytauto.config import settings
 from ytauto.database import init_db

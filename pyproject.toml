@@ -1,0 +1,30 @@
+# pyproject.toml — the modern standard file that describes a Python project.
+#
+# WHY: until now, scripts used a sys.path hack to find src/ytauto. The real
+# fix is to INSTALL our own package in "editable" mode:
+#
+#     pip install -e .
+#
+# -e (editable) means pip links to src/ instead of copying it — edit code,
+# changes apply instantly, but imports work from anywhere, no hacks.
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ytauto"
+version = "0.1.0"
+description = "AI-powered YouTube automation pipeline"
+requires-python = ">=3.10"
+dependencies = [
+    "python-dotenv>=1.0",
+    "requests>=2.31",
+    "feedparser>=6.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+
+[tool.setuptools.packages.find]
+where = ["src"]

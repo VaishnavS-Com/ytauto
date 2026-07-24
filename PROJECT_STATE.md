@@ -59,13 +59,13 @@ FastAPI, Gradio, YouTube API, Git.
 - `scripts/topics_cli.py` — argparse CLI (add / list)
 - 12 passing tests (throwaway DBs via tmp_path)
 
-**Milestone 1 exercises — learner status: ⬜ NOT YET DONE**
-1. Drive the CLI, add 5 topics, watch a duplicate get refused
-2. `pytest -v` → 12 passed, read the output
-3. Peek at raw rows; explain why the app shouldn't bypass the repository
-4. Write `delete_topic()` + test → 13 passed
-5. Thinking: separate `scripts` table vs columns on `topics`? Defend choice
-6. Commit + push
+**Milestone 1 exercises — ✅ ALL DONE**
+1. ✅ Drove the CLI, added 5 topics, watched duplicate get refused
+2. ✅ `pytest -v` → 13 passed, matched each test to its purpose
+3. ✅ Peeked at raw rows; explained why the app shouldn't bypass the repository
+4. ✅ Wrote `delete_topic()` + test → 13 passed
+5. ✅ Thinking: separate `scripts` table (one topic → many drafts)
+6. ✅ Committed + pushed
 
 ## Next up
 

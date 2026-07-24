@@ -6,12 +6,7 @@ never touch data/ytauto.db, never see each other's data, and can run in any
 order. Isolated tests are trustworthy tests.
 """
 
-import sys
-from pathlib import Path
-
 import pytest
-
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
 from ytauto.database import init_db
 from ytauto.repositories import topic_repository as topics

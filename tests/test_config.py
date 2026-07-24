@@ -5,10 +5,6 @@ broken, every later phase breaks. Testing the foundation first is a habit
 worth building on day one.
 """
 
-import sys
-from pathlib import Path
-
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
 from ytauto.config import settings
 
