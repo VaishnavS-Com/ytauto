@@ -28,7 +28,7 @@ Python, Windows laptop, 8–16 GB RAM, no GPU, Ollama installed (llama3.2:3b).
 | 3 | Voiceover via free TTS (Edge TTS / Coqui) | ✅ COMPLETE |
 | 4 | AI image generation (free/local) | ✅ COMPLETE |
 | 5 | B-roll: generate or auto-download copyright-free clips | ⬜ |
-| 6 | Final video assembly: subtitles, transitions, zooms, music, captions (MoviePy/FFmpeg) | ⬜ |
+| 6 | Final video assembly: subtitles, transitions, zooms, music, captions (MoviePy/FFmpeg) | ✅ COMPLETE |
 | 7 | AI thumbnail | ⬜ |
 | 8 | SEO optimization | ⬜ |
 | 9 | Auto-upload via YouTube API | ⬜ |
@@ -146,10 +146,27 @@ FastAPI, Gradio, YouTube API, Git.
 6. ✅ Thinking: prompt-hash caching prevents duplicate renders/downloads across script revisions
 7. ✅ Committed + pushed
 
+### ✅ Milestone 7 — Video Assembly with MoviePy (docs/milestones/milestone_07.md) — Phase 6 COMPLETE
+- `src/ytauto/video/video_builder.py` — `pair_parts()` audio↔slide contract validation, `_render_moviepy()`
+  stitching per-part audio with slides, crossfade transitions, optional background music mixed at 8% volume, H.264/AAC encoding
+- `src/ytauto/repositories/video_repository.py` — `videos` table tracking rendered MP4 files
+- Topic lifecycle milestone: on successful video render, topic status advances to `produced`
+- 61 passing tests (fake renderer in tests, zero MoviePy overhead during test suite)
+- Rendered first real video: `data/videos/script_2.mp4` (4:14 duration, 5.6 MB size)
+
+**Milestone 7 exercises — ✅ ALL DONE**
+1. ✅ `pip install -r requirements.txt` + `pytest` → 61 passed
+2. ✅ Built real video (`script_2.mp4`): 254.8 seconds (4:14), 5.6 MB, topic 2 status -> `produced`
+3. ✅ Tested optional background music mixing (`--music` parameter)
+4. ✅ Wrote `test_pair_parts_rejects_missing_slide_file` → 61 passed
+5. ✅ Thinking: cleanup policy keeps intermediate assets until `published` status for quick debugging/re-rendering
+6. ✅ Committed + pushed
+
 ## Next up
 
-**Milestone 7 — Video Assembly (Phase 6: The Payoff!).** Combine script + audio + visuals into a real MP4:
-MoviePy + FFmpeg stitching per-part audio with slides/images, adding text overlays/captions, rendering final 1080p MP4.
+**Milestone 8 — End-to-end Pipeline & Whisper Captions (Phase 6/7).**
+One-command orchestrator `scripts/run_pipeline.py` chaining all 6 pipeline stages end-to-end,
+plus Whisper-timed captions overlay for high retention.
 
 ## Key habits established
 
@@ -171,8 +188,8 @@ MoviePy + FFmpeg stitching per-part audio with slides/images, adding text overla
 PROJECT_STATE.md and docs/milestones/ in my automation_progress folder for
 full context. We are building an AI-powered faceless-YouTube automation
 system in phases, one milestone per session, with theory + code + exercises,
-production-quality, free tools only. Milestones 0–6 are complete
+production-quality, free tools only. Milestones 0–7 are complete
 (foundation; topic DB; RSS/Reddit collector; AI topic ranker; script generator;
-Edge TTS voiceover pipeline; Pillow slide renderer & visual asset pipeline, 53 tests). Check the 'exercises'
+Edge TTS voiceover pipeline; Pillow slide renderer; MoviePy video assembly, 61 tests). Check the 'exercises'
 status in PROJECT_STATE.md, review my exercise work if pending, then continue with the
 next milestone listed under 'Next up'. Never skip steps, teach as you build."
