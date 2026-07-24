@@ -105,8 +105,9 @@ FastAPI, Gradio, YouTube API, Git.
 
 **Milestone 4 exercises — ✅ ALL DONE**
 1. ✅ Tests first: 38 passed (exercises 1–3 need Ollama — do in own terminal)
-2. ⏳ Generate real script, read aloud (run `python scripts/generate_script.py`)
-3. ⏳ Tune SECTION_PROMPT, regenerate, compare two drafts
+2. ✅ Generated 2 real scripts (neural networks 658w; RAG 523w)
+3. ✅ Tuned all 3 prompts — LASER FOCUS fixed plan drift (verified via A/B);
+   known issue: sections drift short (~120-145w), length guard pending
 4. ✅ parse_plan rejects 7-chapter plan → 38 tests pass
 5. ✅ Thinking: word-count guard belongs after body assembly, raises LLMError
 6. ✅ Committed + pushed

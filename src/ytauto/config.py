@@ -65,6 +65,11 @@ class Settings:
         default_factory=lambda: os.getenv("OLLAMA_MODEL", "llama3.2:3b")
     )
 
+    # --- Voiceover ---
+    tts_voice: str = field(
+        default_factory=lambda: os.getenv("TTS_VOICE", "en-US-AriaNeural")
+    )
+
     # --- Paths (derived, not from .env) ---
     project_root: Path = PROJECT_ROOT
     data_dir: Path = PROJECT_ROOT / "data"

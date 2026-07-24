@@ -75,6 +75,21 @@ CREATE TABLE IF NOT EXISTS scripts (
 );
 
 CREATE INDEX IF NOT EXISTS idx_scripts_topic ON scripts(topic_id);
+
+-- Milestone 5: voiceover audio. One script -> many PARTS (hook, one per
+-- chapter section, cta), each its own mp3 file so Milestone 7+ can sync
+-- visuals to each part independently. We store the PATH, not the audio:
+-- databases hold facts, filesystems hold media. part_index preserves order.
+CREATE TABLE IF NOT EXISTS voiceovers (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    script_id  INTEGER NOT NULL REFERENCES scripts(id),
+    part_index INTEGER NOT NULL,
+    part_name  TEXT NOT NULL,        -- hook | section_01.. | cta
+    file_path  TEXT NOT NULL,
+    voice      TEXT NOT NULL,        -- provenance, like scripts.model
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    UNIQUE (script_id, part_index)   -- no duplicate parts per script
+);
 """
 
 

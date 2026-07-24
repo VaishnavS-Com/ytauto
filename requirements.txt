@@ -7,3 +7,8 @@ pytest==8.2.2          # testing framework (we test from day one)
 # --- Milestone 2 ---
 requests==2.32.3       # HTTP client — the industry standard
 feedparser==6.0.11     # battle-tested RSS/Atom parsing (20 years of messy XML)
+
+# --- Milestone 5 ---
+# NOTE: keep this fresh — Microsoft rotates auth on the free endpoint and
+# old versions start failing with 403 handshake errors.
+edge-tts>=7.0          # free Microsoft neural voices, no API key
