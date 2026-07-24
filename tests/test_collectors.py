@@ -52,6 +52,13 @@ def test_parse_feed_filters_and_tags_source():
     assert "Celebrity gossip of the week" not in titles     # filtered out
     assert all(i["source"] == "rss:test" for i in ideas)
 
+def test_junk_prefixes_are_skipped():
+    xml = """<?xml version="1.0"?><rss version="2.0"><channel>
+    <item><title>The Download: AI news roundup</title></item>
+    <item><title>What is deep learning really?</title></item>
+    </channel></rss>"""
+    ideas = parse_feed(xml, source="rss:test")
+    assert [i["title"] for i in ideas] == ["What is deep learning really?"]
 
 # --- Reddit parsing ----------------------------------------------------------
 

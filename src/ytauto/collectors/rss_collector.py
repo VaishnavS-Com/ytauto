@@ -28,14 +28,14 @@ FEEDS = {
     "rss:mittechreview": "https://www.technologyreview.com/feed/",
 }
 
-
+JUNK_PREFIXES = ("The Download:", "Show HN:", "Launch HN:")
 def parse_feed(xml_text: str, source: str) -> list[dict]:
     """PURE function: XML text in, idea dicts out. No network. Testable."""
     parsed = feedparser.parse(xml_text)
     ideas = []
     for entry in parsed.entries:
         title = getattr(entry, "title", "").strip()
-        if title and is_relevant(title):
+        if title and is_relevant(title) and not title.startswith(JUNK_PREFIXES):
             ideas.append({"title": title, "source": source})
     return ideas
 

@@ -23,7 +23,7 @@ Python, Windows laptop, 8–16 GB RAM, no GPU, Ollama not yet installed.
 
 | Phase | What | Status |
 |---|---|---|
-| 1 | Find trending topics, multi-source collection, topic DB, dedupe, AI ranking | 🔨 Started (collection done, ranking next) |
+| 1 | Find trending topics, multi-source collection, topic DB, dedupe, AI ranking | ✅ COMPLETE |
 | 2 | LLM generation: title, script, hook, CTA, chapters, description, tags, keywords | ⬜ |
 | 3 | Voiceover via free TTS (Edge TTS / Coqui) | ⬜ |
 | 4 | AI image generation (free/local) | ⬜ |
@@ -83,13 +83,23 @@ FastAPI, Gradio, YouTube API, Git.
 6. ✅ Thinking: recency + title length as cheap RSS quality signals
 7. ✅ Committed + pushed
 
+### ✅ Milestone 3 — AI topic ranking (docs/milestones/milestone_03.md) — PHASE 1 COMPLETE
+- Ollama installed, llama3.2:3b running locally (~4s/topic on CPU)
+- `src/ytauto/llm/ollama_client.py` — JSON mode, health check, LLMError
+- `src/ytauto/ranking/topic_ranker.py` — prompt template, verdict validation,
+  dependency injection (fake LLMs in tests), per-topic failure isolation
+- Schema migration: `_ensure_column` added `rank_reason` to live DB
+- Prompt iterated 3x: vague judgment → strict rules (model dodged them) →
+  **LLM classifies (`dated_news`), code enforces the score cap** — key lesson
+- Junk-prefix filter in rss_collector (policy in code at collection too)
+- 31 passing tests; 39 topics ranked with clean bimodal 4/8 separation
+
 ## Next up
 
-**Milestone 3 — AI topic ranking** (first AI in the pipeline):
-Install Ollama, pull a small model (Gemma 2B / Phi-3 class), build the topic
-ranker: LLM scores each `new` topic for video-worthiness, writes `score` back
-to the DB, moves topics from `new` to `ranked`. Prompt engineering, structured
-LLM output (JSON mode), and handling model failures gracefully.
+**Milestone 4 — Phase 2 begins: script generation.** Top-ranked topic →
+full video package (hook, script, CTA, chapters) via multi-step prompt
+chain with the local LLM; new `scripts` table (one topic → many drafts);
+higher temperature for creative generation; status `ranked` → `scripted`.
 
 ## Key habits established
 
