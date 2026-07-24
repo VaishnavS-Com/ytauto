@@ -68,3 +68,31 @@ def generate_json(prompt: str, temperature: float = 0.2) -> dict:
         # Even JSON mode can occasionally emit garbage (e.g. empty string).
         log.error("Model returned unparseable output: %.200r", raw)
         raise LLMError("Model output was not valid JSON") from exc
+
+
+def generate_text(prompt: str, temperature: float = 0.7) -> str:
+    """Send a prompt, get back plain prose (no JSON constraint).
+
+    Added in Milestone 4 for script WRITING: constraining creative prose
+    to JSON hurts its quality, and higher temperature (0.7) gives the
+    varied, natural writing a narration script needs.
+    """
+    try:
+        response = post_json(
+            f"{settings.ollama_url}/api/generate",
+            {
+                "model": settings.ollama_model,
+                "prompt": prompt,
+                "stream": False,
+                "options": {"temperature": temperature},
+            },
+        )
+    except FetchError as exc:
+        raise LLMError(
+            f"Ollama unreachable at {settings.ollama_url}. Is it running?"
+        ) from exc
+
+    text = (response.get("response") or "").strip()
+    if not text:
+        raise LLMError("Model returned empty text")
+    return text

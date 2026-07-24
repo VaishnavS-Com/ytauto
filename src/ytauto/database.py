@@ -57,6 +57,24 @@ CREATE TABLE IF NOT EXISTS topics (
 );
 
 CREATE INDEX IF NOT EXISTS idx_topics_status ON topics(status);
+
+-- Milestone 4: generated video scripts. One topic -> MANY script drafts
+-- (the one-to-many design from Milestone 1's exercise 5). topic_id is a
+-- FOREIGN KEY: the database refuses a script pointing at a topic that
+-- doesn't exist — referential integrity, enforced by storage again.
+CREATE TABLE IF NOT EXISTS scripts (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    topic_id   INTEGER NOT NULL REFERENCES topics(id),
+    title      TEXT NOT NULL,
+    hook       TEXT NOT NULL,
+    body       TEXT NOT NULL,
+    cta        TEXT NOT NULL,
+    chapters   TEXT NOT NULL,   -- JSON list of chapter titles
+    model      TEXT NOT NULL,   -- which LLM wrote it (provenance!)
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_scripts_topic ON scripts(topic_id);
 """
 
 
@@ -72,6 +90,9 @@ def get_connection(db_path: Path | None = None) -> sqlite3.Connection:
     conn = sqlite3.connect(path)
     # Rows behave like dicts: row["title"] instead of row[1]. Readable code.
     conn.row_factory = sqlite3.Row
+    # SQLite ignores FOREIGN KEY constraints unless told otherwise (historic
+    # quirk). Without this, a script could point at a deleted topic.
+    conn.execute("PRAGMA foreign_keys = ON")
     return conn
 
 

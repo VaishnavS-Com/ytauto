@@ -100,6 +100,15 @@ def update_status(topic_id: int, status: str, db_path: Path | None = None) -> bo
     return updated
 
 
+def best_ranked_topic(db_path: Path | None = None) -> sqlite3.Row | None:
+    """The highest-scored topic still waiting for a script, or None."""
+    with get_connection(db_path) as conn:
+        return conn.execute(
+            "SELECT * FROM topics WHERE status = 'ranked' "
+            "ORDER BY score DESC, id ASC LIMIT 1"
+        ).fetchone()
+
+
 def count_topics(db_path: Path | None = None) -> int:
     """Total number of stored topics."""
     with get_connection(db_path) as conn:
