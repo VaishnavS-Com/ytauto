@@ -136,8 +136,10 @@ def generate_script(
             SECTION_PROMPT.format(title=title, chapters=chapters, chapter=chapter),
             temperature=0.7,
         )
-        sections.append(text)
-        log.info("Section %r: %d words", chapter, len(text.split()))
+        # Collapse internal blank lines within a section so \n\n in body strictly separates chapters
+        clean_text = " ".join(part.strip() for part in text.split("\n\n") if part.strip())
+        sections.append(clean_text)
+        log.info("Section %r: %d words", chapter, len(clean_text.split()))
     body = "\n\n".join(sections)
 
     # --- Step 3: hook + CTA (warmest, written knowing the whole plan) ---------
