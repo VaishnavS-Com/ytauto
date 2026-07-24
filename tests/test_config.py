@@ -30,6 +30,12 @@ def test_ensure_dirs_creates_folders():
     assert settings.logs_dir.is_dir()
 
 
+def test_max_videos_per_day():
+    """max_videos_per_day must be an int ≥ 1 (not a raw env-var string)."""
+    assert isinstance(settings.max_videos_per_day, int)
+    assert settings.max_videos_per_day >= 1
+
+
 def test_settings_are_immutable():
     """frozen=True must prevent accidental mutation at runtime."""
     import dataclasses

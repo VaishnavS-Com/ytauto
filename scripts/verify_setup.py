@@ -32,6 +32,7 @@ def main() -> None:
     print(f"Logs dir     : {settings.logs_dir}")
 
     log.info("Milestone 0 verification ran successfully")
+    log.debug("This only appears when LOG_LEVEL=DEBUG")
     print("\nOK — now open logs/app.log and confirm the log line is there.")
 
 

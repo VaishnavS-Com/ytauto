@@ -53,6 +53,10 @@ class Settings:
         default_factory=lambda: os.getenv("CHANNEL_NICHE", "tech_ai_explainers")
     )
 
+    max_videos_per_day: int = field(
+        default_factory=lambda: int(os.getenv("MAX_VIDEOS_PER_DAY", "1"))
+    )
+
     # --- Paths (derived, not from .env) ---
     project_root: Path = PROJECT_ROOT
     data_dir: Path = PROJECT_ROOT / "data"
