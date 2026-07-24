@@ -106,6 +106,32 @@ def count_topics(db_path: Path | None = None) -> int:
         return conn.execute("SELECT COUNT(*) FROM topics").fetchone()[0]
 
 
+def set_rank(
+    topic_id: int,
+    score: float,
+    reason: str,
+    db_path: Path | None = None,
+) -> bool:
+    """Store the AI's verdict and advance the topic to 'ranked'.
+
+    One UPDATE = one transaction: score, reason, and status change together
+    or not at all. Never leave a topic half-ranked.
+    """
+    with get_connection(db_path) as conn:
+        cursor = conn.execute(
+            "UPDATE topics SET score = ?, rank_reason = ?, status = 'ranked' "
+            "WHERE id = ?",
+            (score, reason, topic_id),
+        )
+        updated = cursor.rowcount > 0
+
+    if updated:
+        log.info("Topic %d ranked: %.1f", topic_id, score)
+    else:
+        log.warning("set_rank: topic id %d not found", topic_id)
+    return updated
+
+
 def delete_topic(topic_id: int, db_path: Path | None = None) -> bool:
     """Remove a topic by id. Returns False if id doesn't exist."""
     with get_connection(db_path) as conn:

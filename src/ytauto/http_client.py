@@ -73,3 +73,40 @@ def fetch_json(url: str, retries: int = 3, timeout: int = DEFAULT_TIMEOUT) -> di
     import json
 
     return json.loads(fetch_text(url, retries=retries, timeout=timeout))
+
+
+def post_json(
+    url: str,
+    payload: dict,
+    retries: int = 2,
+    timeout: int = 120,
+) -> dict:
+    """POST a JSON payload and return the JSON response.
+
+    Added in Milestone 3 for talking to Ollama. Note the much longer
+    default timeout: a local LLM on a CPU laptop can take a minute to
+    answer — that's normal, not a hang. Fewer retries too: if the model
+    is down, retrying won't start it.
+    """
+    last_error: Exception | None = None
+
+    for attempt in range(1, retries + 1):
+        try:
+            response = requests.post(
+                url,
+                json=payload,
+                timeout=timeout,
+                headers={"User-Agent": USER_AGENT},
+            )
+            response.raise_for_status()
+            return response.json()
+
+        except requests.RequestException as exc:
+            last_error = exc
+            log.warning("POST failed (attempt %d/%d) for %s: %s",
+                        attempt, retries, url, exc)
+            if attempt < retries:
+                time.sleep(2**attempt)
+
+    log.error("Giving up on POST %s after %d attempts", url, retries)
+    raise FetchError(f"Could not POST to {url}") from last_error

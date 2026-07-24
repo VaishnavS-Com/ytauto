@@ -75,8 +75,27 @@ def get_connection(db_path: Path | None = None) -> sqlite3.Connection:
     return conn
 
 
+def _ensure_column(
+    conn: sqlite3.Connection, table: str, column: str, decl: str
+) -> None:
+    """Tiny MIGRATION helper: add a column if the table doesn't have it yet.
+
+    Why needed: `CREATE TABLE IF NOT EXISTS` does nothing when the table
+    already exists — so adding a column to SCHEMA alone would only affect
+    BRAND NEW databases. Existing databases (yours, with real topics in it!)
+    must be altered in place. This is the simplest form of what production
+    teams do with tools like Alembic: evolve the schema without losing data.
+    """
+    columns = [row["name"] for row in conn.execute(f"PRAGMA table_info({table})")]
+    if column not in columns:
+        conn.execute(f"ALTER TABLE {table} ADD COLUMN {column} {decl}")
+        log.info("Migration: added column %s.%s", table, column)
+
+
 def init_db(db_path: Path | None = None) -> None:
-    """Create all tables if they don't exist. Safe to run at every startup."""
+    """Create tables if missing, then apply migrations. Idempotent."""
     with get_connection(db_path) as conn:
         conn.executescript(SCHEMA)
+        # --- migrations (each one idempotent, in the order they were added) ---
+        _ensure_column(conn, "topics", "rank_reason", "TEXT")   # Milestone 3
     log.info("Database initialized")

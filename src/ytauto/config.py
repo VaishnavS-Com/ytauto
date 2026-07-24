@@ -57,6 +57,14 @@ class Settings:
         default_factory=lambda: int(os.getenv("MAX_VIDEOS_PER_DAY", "1"))
     )
 
+    # --- Local LLM ---
+    ollama_url: str = field(
+        default_factory=lambda: os.getenv("OLLAMA_URL", "http://localhost:11434")
+    )
+    ollama_model: str = field(
+        default_factory=lambda: os.getenv("OLLAMA_MODEL", "llama3.2:3b")
+    )
+
     # --- Paths (derived, not from .env) ---
     project_root: Path = PROJECT_ROOT
     data_dir: Path = PROJECT_ROOT / "data"
