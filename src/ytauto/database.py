@@ -104,6 +104,16 @@ CREATE TABLE IF NOT EXISTS assets (
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
     UNIQUE (script_id, part_index, kind)
 );
+
+-- Milestone 7: rendered videos. One script can be rendered many times
+-- (re-render after fixing a slide), newest is the real one.
+CREATE TABLE IF NOT EXISTS videos (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    script_id   INTEGER NOT NULL REFERENCES scripts(id),
+    file_path   TEXT NOT NULL,
+    duration_s  REAL NOT NULL,
+    created_at  TEXT NOT NULL DEFAULT (datetime('now'))
+);
 """
 
 
