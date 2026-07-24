@@ -1,0 +1,23 @@
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# ---- Secrets (NEVER commit these) ----
+.env
+
+# ---- Generated data & logs ----
+data/*
+!data/.gitkeep
+logs/*
+!logs/.gitkeep
+
+# ---- OS / editor noise ----
+.DS_Store
+Thumbs.db
+.vscode/
+
+# ---- Old archived web app (not part of this project) ----
+_archive_webapp/

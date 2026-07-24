@@ -1,0 +1,5 @@
+# Milestone 0 dependencies only. We add libraries WHEN we need them,
+# never before — this keeps the environment lean and installs fast.
+
+python-dotenv==1.0.1   # loads .env file into environment variables
+pytest==8.2.2          # testing framework (we test from day one)
