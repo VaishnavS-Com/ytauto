@@ -26,7 +26,7 @@ Python, Windows laptop, 8–16 GB RAM, no GPU, Ollama installed (llama3.2:3b).
 | 1 | Find trending topics, multi-source collection, topic DB, dedupe, AI ranking | ✅ COMPLETE |
 | 2 | LLM generation: title, script, hook, CTA, chapters, description, tags, keywords | 🔨 Started (script chain done) |
 | 3 | Voiceover via free TTS (Edge TTS / Coqui) | ✅ COMPLETE |
-| 4 | AI image generation (free/local) | ⬜ |
+| 4 | AI image generation (free/local) | ✅ COMPLETE |
 | 5 | B-roll: generate or auto-download copyright-free clips | ⬜ |
 | 6 | Final video assembly: subtitles, transitions, zooms, music, captions (MoviePy/FFmpeg) | ⬜ |
 | 7 | AI thumbnail | ⬜ |
@@ -128,12 +128,28 @@ FastAPI, Gradio, YouTube API, Git.
 5. ✅ Thinking: concurrent TTS risks 429 rate-limiting; protected by exponential backoff (M2 concept)
 6. ✅ Committed + pushed
 
+### ✅ Milestone 6 — Visuals & Slide Rendering (docs/milestones/milestone_06.md) — Phase 4 COMPLETE
+- `src/ytauto/visuals/slide_renderer.py` — 1920x1080 Full HD slide renderer using Pillow
+  with font discovery & pixel-measured word wrapping
+- `src/ytauto/visuals/visual_generator.py` — LLM distills sections into headline/support + AI image prompts;
+  hook and CTA get structured slides without LLM call
+- `src/ytauto/repositories/asset_repository.py` — `assets` table tracking slides and AI images with FK to scripts
+- Dual failure policy: slides are strict baseline (all-or-nothing), AI images are garnish (skip on failure)
+- 53 passing tests (fake LLM and image fetcher in tests, zero network required)
+
+**Milestone 6 exercises — ✅ ALL DONE**
+1. ✅ `pip install -r requirements.txt` + `pytest` → 53 passed
+2. ✅ Generated visuals (`script_2`): 10 slide PNGs rendered in `data/visuals/script_2`
+3. ✅ Tested `--ai` mode: pollinations.ai image fetcher integrated with fallback error handling
+4. ✅ Configured branding (Pillow layout, colors, typography tokens)
+5. ✅ Wrote `test_generate_visuals_empty_body` → 53 passed
+6. ✅ Thinking: prompt-hash caching prevents duplicate renders/downloads across script revisions
+7. ✅ Committed + pushed
+
 ## Next up
 
-**Milestone 6 — Image generation & slide rendering (Phase 4).** Every part gets a visual:
-AI-generated images via free APIs / local SD where feasible, plus a programmatic slide
-renderer with Pillow (title cards, key-point slides) as the reliable workhorse. `assets`
-table for tracking media items, with LLM generating visual prompts from section text.
+**Milestone 7 — Video Assembly (Phase 6: The Payoff!).** Combine script + audio + visuals into a real MP4:
+MoviePy + FFmpeg stitching per-part audio with slides/images, adding text overlays/captions, rendering final 1080p MP4.
 
 ## Key habits established
 
@@ -155,8 +171,8 @@ table for tracking media items, with LLM generating visual prompts from section 
 PROJECT_STATE.md and docs/milestones/ in my automation_progress folder for
 full context. We are building an AI-powered faceless-YouTube automation
 system in phases, one milestone per session, with theory + code + exercises,
-production-quality, free tools only. Milestones 0–5 are complete
+production-quality, free tools only. Milestones 0–6 are complete
 (foundation; topic DB; RSS/Reddit collector; AI topic ranker; script generator;
-Edge TTS voiceover pipeline, 45 tests). Check the 'exercises' status in
-PROJECT_STATE.md, review my exercise work if pending, then continue with the
+Edge TTS voiceover pipeline; Pillow slide renderer & visual asset pipeline, 53 tests). Check the 'exercises'
+status in PROJECT_STATE.md, review my exercise work if pending, then continue with the
 next milestone listed under 'Next up'. Never skip steps, teach as you build."
