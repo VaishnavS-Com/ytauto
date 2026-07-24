@@ -24,7 +24,7 @@ Python, Windows laptop, 8–16 GB RAM, no GPU, Ollama installed (llama3.2:3b).
 | Phase | What | Status |
 |---|---|---|
 | 1 | Find trending topics, multi-source collection, topic DB, dedupe, AI ranking | ✅ COMPLETE |
-| 2 | LLM generation: title, script, hook, CTA, chapters, description, tags, keywords | 🔨 Started (script chain done) |
+| 2 | LLM generation: title, script, hook, CTA, chapters, description, tags, keywords | ✅ COMPLETE |
 | 3 | Voiceover via free TTS (Edge TTS / Coqui) | ✅ COMPLETE |
 | 4 | AI image generation (free/local) | ✅ COMPLETE |
 | 5 | B-roll: generate or auto-download copyright-free clips | ⬜ |
@@ -162,11 +162,25 @@ FastAPI, Gradio, YouTube API, Git.
 5. ✅ Thinking: cleanup policy keeps intermediate assets until `published` status for quick debugging/re-rendering
 6. ✅ Committed + pushed
 
+### ✅ Milestone 8 — Research Injection & RAG Grounding (docs/milestones/milestone_08.md) — GROUNDING COMPLETE
+- `src/ytauto/research/wiki_research.py` — LLM extracts search terms → Wikipedia search & summary APIs → formatted notes block
+- `src/ytauto/generation/script_generator.py` — rewritten prompts forbidding fake statistics & requiring facts ONLY from research notes
+- `src/ytauto/database.py` — `research_notes` column migration added to topics table
+- 71 passing tests (including temperature spied test & grounding prompt pin test)
+- Re-generated grounded video for topic 2 (`script_3.mp4`, 5:01): eliminated hallucinated RAG definition & fake numbers with real Ian Goodfellow 2014 citation
+
+**Milestone 8 exercises — ✅ ALL DONE**
+1. ✅ `pytest` → 71 passed
+2. ✅ Redemption run (`script_3.mp4`): verified correct RAG definitions & real historical facts from Wikipedia
+3. ✅ Audited research notes: 1176 chars of verified Wikipedia summaries cached in database
+4. ✅ Wrote `test_temperature_per_stage_spied` → 71 passed
+5. ✅ Thinking: research notes staleness managed via topic creation timestamp & explicit refresh
+6. ✅ Committed + pushed
+
 ## Next up
 
-**Milestone 8 — End-to-end Pipeline & Whisper Captions (Phase 6/7).**
-One-command orchestrator `scripts/run_pipeline.py` chaining all 6 pipeline stages end-to-end,
-plus Whisper-timed captions overlay for high retention.
+**Milestone 9 — Attractiveness: Motion, AI Backgrounds & Whisper Captions (Phase 6 Polish).**
+Transform simple slide video into dynamic visual content: Ken Burns zoom/pan effects, dark-overlay AI image backgrounds, varied slide layouts, and Whisper word-timed burn-in captions for high viewer retention.
 
 ## Key habits established
 
@@ -188,8 +202,8 @@ plus Whisper-timed captions overlay for high retention.
 PROJECT_STATE.md and docs/milestones/ in my automation_progress folder for
 full context. We are building an AI-powered faceless-YouTube automation
 system in phases, one milestone per session, with theory + code + exercises,
-production-quality, free tools only. Milestones 0–7 are complete
+production-quality, free tools only. Milestones 0–8 are complete
 (foundation; topic DB; RSS/Reddit collector; AI topic ranker; script generator;
-Edge TTS voiceover pipeline; Pillow slide renderer; MoviePy video assembly, 61 tests). Check the 'exercises'
+Edge TTS voiceover pipeline; Pillow slide renderer; MoviePy video assembly; RAG research grounding, 71 tests). Check the 'exercises'
 status in PROJECT_STATE.md, review my exercise work if pending, then continue with the
 next milestone listed under 'Next up'. Never skip steps, teach as you build."
