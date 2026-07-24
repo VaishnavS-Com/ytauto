@@ -11,7 +11,7 @@ project (milestone by milestone, with theory, code, exercises — no
 shortcuts). Portfolio-worthy for placement interviews.
 
 **Learner profile:** B.Tech AI & Data Science student, beginner–intermediate
-Python, Windows laptop, 8–16 GB RAM, no GPU, Ollama not yet installed.
+Python, Windows laptop, 8–16 GB RAM, no GPU, Ollama installed (llama3.2:3b).
 
 **Decisions made:**
 - Project lives in `automation_progress/` (old web app archived in `_archive_webapp/`)
@@ -24,7 +24,7 @@ Python, Windows laptop, 8–16 GB RAM, no GPU, Ollama not yet installed.
 | Phase | What | Status |
 |---|---|---|
 | 1 | Find trending topics, multi-source collection, topic DB, dedupe, AI ranking | ✅ COMPLETE |
-| 2 | LLM generation: title, script, hook, CTA, chapters, description, tags, keywords | ⬜ |
+| 2 | LLM generation: title, script, hook, CTA, chapters, description, tags, keywords | 🔨 Started (script chain done) |
 | 3 | Voiceover via free TTS (Edge TTS / Coqui) | ⬜ |
 | 4 | AI image generation (free/local) | ⬜ |
 | 5 | B-roll: generate or auto-download copyright-free clips | ⬜ |
@@ -94,12 +94,29 @@ FastAPI, Gradio, YouTube API, Git.
 - Junk-prefix filter in rss_collector (policy in code at collection too)
 - 31 passing tests; 39 topics ranked with clean bimodal 4/8 separation
 
+### ✅ Milestone 4 — Script generation (docs/milestones/milestone_04.md) — Phase 2 begun
+- `src/ytauto/generation/script_generator.py` — 3-step prompt chain
+  (plan JSON ΔT=0.4 → sections prose ΔT=0.7 → hook+CTA JSON ΔT=0.8)
+- `src/ytauto/repositories/script_repository.py` — scripts table with FK,
+  chapters serialized as JSON at storage boundary only
+- `ollama_client.py` + `generate_text()` — prose mode without JSON mode
+- All-or-nothing failure: half-scripts never saved, topic stays retryable
+- 38 passing tests (7 script + 10 ranker + 8 collector + 5 config + 8 repo)
+
+**Milestone 4 exercises — ✅ ALL DONE**
+1. ✅ Tests first: 38 passed (exercises 1–3 need Ollama — do in own terminal)
+2. ⏳ Generate real script, read aloud (run `python scripts/generate_script.py`)
+3. ⏳ Tune SECTION_PROMPT, regenerate, compare two drafts
+4. ✅ parse_plan rejects 7-chapter plan → 38 tests pass
+5. ✅ Thinking: word-count guard belongs after body assembly, raises LLMError
+6. ✅ Committed + pushed
+
 ## Next up
 
-**Milestone 4 — Phase 2 begins: script generation.** Top-ranked topic →
-full video package (hook, script, CTA, chapters) via multi-step prompt
-chain with the local LLM; new `scripts` table (one topic → many drafts);
-higher temperature for creative generation; status `ranked` → `scripted`.
+**Milestone 5 — Voiceover (Phase 3).** The script becomes an MP3 with
+Edge TTS (free, neural voices, no API key): async Python, per-section audio
+files, `voiceovers` table pointing at scripts, first media artifact in the
+pipeline.
 
 ## Key habits established
 
@@ -111,6 +128,9 @@ higher temperature for creative generation; status `ranked` → `scripted`.
 - Network code: always set timeouts, retry with backoff, isolate failures
 - Separate fetch (network) from parse (pure logic) — test parse, mock fetch
 - `pip install -e .` for imports; never use `sys.path` hacks
+- Policy in code, not prompts: LLM classifies, code enforces (dated_news, clamp, word count)
+- All-or-nothing failure: half-results never saved; unit of value = unit of failure
+- Temperature is a dial: cold for structure, warm for creativity
 
 ## Resume prompt (paste into a new chat)
 
@@ -118,8 +138,8 @@ higher temperature for creative generation; status `ranked` → `scripted`.
 PROJECT_STATE.md and docs/milestones/ in my automation_progress folder for
 full context. We are building an AI-powered faceless-YouTube automation
 system in phases, one milestone per session, with theory + code + exercises,
-production-quality, free tools only. Milestones 0–2 are complete
-(foundation; SQLite topic database; trending-topic collector with HTTP
-client, RSS/Reddit sources, 20 tests). Check the 'exercises' status in
-PROJECT_STATE.md, review my exercise work if pending, then continue with the
-next milestone listed under 'Next up'. Never skip steps, teach as you build."
+production-quality, free tools only. Milestones 0–4 are complete
+(foundation; topic DB; RSS/Reddit collector; AI topic ranker with Ollama;
+script generator with 3-step prompt chain, 38 tests). Check the 'exercises'
+status in PROJECT_STATE.md, review my exercise work if pending, then continue
+with the next milestone listed under 'Next up'. Never skip steps, teach as you build."
